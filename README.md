@@ -6,6 +6,11 @@ To run:
 ```shell
 ./gradlew quarkusDev
 ```
+or
+```shell
+./gradlew quarkusTest
+```
+
 
 
 
