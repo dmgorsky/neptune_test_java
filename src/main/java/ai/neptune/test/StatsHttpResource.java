@@ -18,6 +18,7 @@ public class StatsHttpResource {
     @Path("stats")
 
     @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
     public RestResponse<StatsResponse> getStats(@QueryParam("symbol") String symbol,
                                                 @QueryParam("k") int k) {
         var result = servicesRegistry.getStats(symbol, k);

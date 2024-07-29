@@ -22,11 +22,11 @@ public class ServicesRegistry {
     }
 
     public Either<String, String> addBatch(AddBatch command) {
-        if (priceServices.size() > 10) {
+        if (!priceServices.isEmpty() && priceServices.size() > 10) {
             return Either.left("Too many symbols");
         }
-        priceServices.putIfAbsent(command.getSymbol(), new PriceService());
-        var priceService = priceServices.get(command.getSymbol());
-        return priceService.addBatch(command.getValues());
+        priceServices.putIfAbsent(command.symbol(), new PriceService());
+        var priceService = priceServices.get(command.symbol());
+        return priceService.addBatch(command.values());
     }
 }

@@ -10,12 +10,15 @@ repositories {
 
 dependencies {
     implementation group: 'io.vavr', name: 'vavr', version: '0.10.4'
-    implementation 'io.quarkus:quarkus-rest-jsonb'
+    testImplementation 'io.quarkus:quarkus-rest-jackson'
     implementation enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}")
     implementation 'io.quarkus:quarkus-rest'
     implementation 'io.quarkus:quarkus-arc'
     testImplementation 'io.quarkus:quarkus-junit5'
     testImplementation 'io.rest-assured:rest-assured'
+    testImplementation 'io.quarkus:quarkus-rest-jackson'
+    testImplementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '4.0.5'
+
 }
 
 group 'ai.neptune.test'
