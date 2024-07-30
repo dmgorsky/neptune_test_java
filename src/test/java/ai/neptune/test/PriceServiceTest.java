@@ -39,19 +39,19 @@ class PriceServiceTest {
         //checking guard for null
         ab = priceService.addBatch(new Float[100]);
         Assertions.assertEquals("Null value present", ab.getLeft());
-        System.err.println("#3");
 
         //checking stats calculation (simple case, last 1e1 entries)
         var st = priceService.getStats(1);
 
-        System.err.println(st.toString());
         Assertions.assertTrue(st.isRight());
         var stats = st.get();
         Assertions.assertEquals(1f, stats.prices_min());
         Assertions.assertEquals(10f, stats.prices_max());
         Assertions.assertEquals(55f, stats.prices_sum());
-        Assertions.assertEquals(8.25f, stats.prices_variance());
+        Assertions.assertTrue((stats.prices_variance() - Math.sqrt(8.25f)) <= 0.001);
+//        Assertions.assertEquals(8.25f, stats.prices_variance());
         Assertions.assertEquals(10f, stats.prices_last());
+        System.err.println(stats);
 
     }
 

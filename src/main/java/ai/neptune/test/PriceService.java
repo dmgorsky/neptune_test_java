@@ -35,27 +35,30 @@ public class PriceService {
         var sLast = prices[nextStartSequence.get() - 1];
         var sVariance = 0.0f;
         var startFrom = nextStartSequence.get() - 1;
+        Float mean;
+        Float varianceSq = 0f;
 
-        //1st pass
-        var it = new StatsReverseIterator(k);
+        //1 pass
+        var it = new StatsRevDataStream(k);
+        mean = it.peekNext(); // starting value from the stream
+
 
         while (it.hasNext()) {
-            var next = it.next();
-            sSum += next;
-            sMin = Math.min(sMin, next);
-            sMax = Math.max(sMax, next);
+            var currValue = it.next();
+            sSum += currValue;
+            sMin = Math.min(sMin, currValue);
+            sMax = Math.max(sMax, currValue);
+            if (sCount > 0) { // skipping the first element
+                var delta = currValue - mean;
+                mean += delta / (sCount + 1);
+                varianceSq += delta * (currValue - mean);
+            }
+
             sCount++;
-        }
-        var mean = sSum / sCount;
 
-        //2nd pass (for variance)
-        it = new StatsReverseIterator(k);
-        while (it.hasNext()) {
-            var next = it.next();
-            sVariance += (next - mean) * (next - mean);
         }
 
-        sVariance /= sCount;
+        sVariance = (float) Math.sqrt(varianceSq / sCount);
 
         var endTo = (startFrom - realK) % maxSize;
         if (endTo < 0) {
@@ -116,13 +119,13 @@ public class PriceService {
      * If `k` order is greater than actual prices added,
      * the iterator will take prices initially in the array.
      **/
-    public class StatsReverseIterator implements Iterator<Float> {
+    public class StatsRevDataStream implements Iterator<Float> {
         private int endIndex; // start index for reverse iteration
 
         private int neededCount; // how many values we want to take
         private int index;
 
-        public StatsReverseIterator(int k) {
+        public StatsRevDataStream(int k) {
             this.neededCount = (int) Math.min(maxSize, Math.pow(10, k));
             this.endIndex = nextStartSequence.get() - 1;
             this.index = endIndex;
@@ -141,5 +144,14 @@ public class PriceService {
             this.neededCount--;
             return prices[index--];
         }
+
+        //peeking next element from the stream w/o moving a pointer
+        public Float peekNext() {
+            if (this.index < 0) {
+                this.index = endIndex;
+            }
+            return prices[index];
+        }
+
     }
 }
